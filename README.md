@@ -2,6 +2,8 @@
 
 Chatbeat turns a WhatsApp chat export into a dashboard of message activity, participant stats, and common words and emojis. It opens with a fictional group chat so you can explore the dashboard before opening your own export.
 
+![Chatbeat dashboard](docs/chatbeat.png)
+
 ## Download and run locally
 
 You’ll need Node.js 20.9 or newer and npm. Clone the repository and start the development server.
