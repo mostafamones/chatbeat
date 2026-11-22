@@ -7,7 +7,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   XAxis,
   YAxis,
 } from "recharts"
@@ -16,6 +15,7 @@ import {
   IconCalendarWeek,
   IconClockHour4,
   IconFlame,
+  IconMessageCircle,
   IconMoodSmile,
   IconPaperclip,
   IconSparkles,
@@ -55,166 +55,112 @@ const numberFormatter = new Intl.NumberFormat("en")
 const userComparisonConfig = {
   messages: {
     label: "Messages",
-    color: "var(--color-chart-1)",
+    color: "var(--chart-1)",
   },
   words: {
     label: "Words",
-    color: "var(--color-chart-2)",
+    color: "var(--chart-2)",
   },
   letters: {
     label: "Letters",
-    color: "var(--color-chart-3)",
+    color: "var(--chart-3)",
   },
 } satisfies ChartConfig
 
 const userExpressiveConfig = {
   attachments: {
     label: "Attachments",
-    color: "var(--color-chart-4)",
+    color: "var(--chart-4)",
   },
   emojis: {
     label: "Emojis",
-    color: "var(--color-chart-5)",
+    color: "var(--chart-5)",
+  },
+} satisfies ChartConfig
+
+const talkerConfig = {
+  messages: {
+    label: "Messages",
+    color: "var(--chart-1)",
   },
 } satisfies ChartConfig
 
 const countConfig = {
   count: {
     label: "Messages",
-    color: "var(--color-chart-2)",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig
 
 const dateConfig = {
   count: {
     label: "Messages",
-    color: "var(--color-chart-1)",
+    color: "var(--chart-1)",
   },
 } satisfies ChartConfig
 
 const wordsConfig = {
   value: {
     label: "Messages containing word",
-    color: "var(--color-chart-3)",
+    color: "var(--chart-3)",
   },
 } satisfies ChartConfig
 
 const emojiConfig = {
   value: {
     label: "Emoji uses",
-    color: "var(--color-chart-4)",
+    color: "var(--chart-4)",
   },
 } satisfies ChartConfig
 
-export function WhatsAppDashboard({
-  dashboard,
-  fileName,
-  error,
-}: {
-  dashboard: DashboardStats | null
-  fileName: string
-  error: string | null
-}) {
+const dashboardTabs = [
+  { id: "overview", label: "Overview", Panel: OverviewTab },
+  { id: "people", label: "People", Panel: PeopleTab },
+  { id: "time", label: "Time", Panel: TimeTab },
+  { id: "words", label: "Words & Emojis", Panel: WordsTab },
+  { id: "highlights", label: "Highlights", Panel: HighlightsTab },
+]
+
+export function WhatsAppDashboard({ dashboard }: { dashboard: DashboardStats }) {
+  const { messageCount, letterCount, attachmentCount, emojiCount } = dashboard.aggregates
+
   return (
-    <main className="min-h-svh bg-background">
-      <div className="relative isolate overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(62,179,122,0.18),transparent_28%),radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_22%)]" />
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard
-              title="Total messages"
-              value={
-                dashboard
-                  ? numberFormatter.format(dashboard.aggregates.messageCount)
-                  : "—"
-              }
-              description="Every user message in the export."
-              icon={IconCalendarStats}
-            />
-            <StatCard
-              title="Total letters"
-              value={
-                dashboard
-                  ? numberFormatter.format(dashboard.aggregates.letterCount)
-                  : "—"
-              }
-              description="Unicode letters across all message text."
-              icon={IconTypography}
-            />
-            <StatCard
-              title="Total attachments"
-              value={
-                dashboard
-                  ? numberFormatter.format(dashboard.aggregates.attachmentCount)
-                  : "—"
-              }
-              description="Detected from export placeholders and attached files."
-              icon={IconPaperclip}
-            />
-            <StatCard
-              title="Total emojis"
-              value={
-                dashboard
-                  ? numberFormatter.format(dashboard.aggregates.emojiCount)
-                  : "—"
-              }
-              description="Every emoji occurrence across the chat."
-              icon={IconMoodSmile}
-            />
-          </section>
+    <>
+      <dl
+        aria-label="Chat totals"
+        className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-4"
+      >
+        <StatCard title="Messages" value={messageCount} icon={IconMessageCircle} />
+        <StatCard title="Letters typed" value={letterCount} icon={IconTypography} />
+        <StatCard title="Attachments" value={attachmentCount} icon={IconPaperclip} warm />
+        <StatCard title="Emojis used" value={emojiCount} icon={IconMoodSmile} warm />
+      </dl>
 
-          <Tabs defaultValue="overview" className="gap-4">
-            <TabsList className="h-auto w-full flex-wrap justify-start gap-1 rounded-2xl bg-card/85 p-2 ring-1 ring-foreground/10 backdrop-blur">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="people">People</TabsTrigger>
-              <TabsTrigger value="time">Time</TabsTrigger>
-              <TabsTrigger value="words">Words & Emojis</TabsTrigger>
-              <TabsTrigger value="highlights">Highlights</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview">
-              {dashboard ? (
-                <OverviewTab dashboard={dashboard} />
-              ) : (
-                <LoadErrorCard fileName={fileName} error={error} compact />
-              )}
-            </TabsContent>
-
-            <TabsContent value="people">
-              {dashboard ? (
-                <PeopleTab dashboard={dashboard} />
-              ) : (
-                <LoadErrorCard fileName={fileName} error={error} compact />
-              )}
-            </TabsContent>
-
-            <TabsContent value="time">
-              {dashboard ? (
-                <TimeTab dashboard={dashboard} />
-              ) : (
-                <LoadErrorCard fileName={fileName} error={error} compact />
-              )}
-            </TabsContent>
-
-            <TabsContent value="words">
-              {dashboard ? (
-                <WordsTab dashboard={dashboard} />
-              ) : (
-                <LoadErrorCard fileName={fileName} error={error} compact />
-              )}
-            </TabsContent>
-
-            <TabsContent value="highlights">
-              {dashboard ? (
-                <HighlightsTab dashboard={dashboard} />
-              ) : (
-                <LoadErrorCard fileName={fileName} error={error} compact />
-              )}
-            </TabsContent>
-          </Tabs>
+      <Tabs defaultValue="overview" className="mt-7 gap-5">
+        <div className="overflow-x-auto border-b border-border pb-1.5">
+          <TabsList
+            aria-label="Chat analytics"
+            variant="line"
+            className="min-h-11 justify-start gap-2"
+          >
+            {dashboardTabs.map(({ id, label }) => (
+              <TabsTrigger
+                key={id}
+                value={id}
+                className="min-h-10 px-3 text-sm after:bg-primary sm:px-4"
+              >
+                {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-      </div>
-    </main>
+        {dashboardTabs.map(({ id, Panel }) => (
+          <TabsContent key={id} value={id}>
+            <Panel dashboard={dashboard} />
+          </TabsContent>
+        ))}
+      </Tabs>
+    </>
   )
 }
 
@@ -224,9 +170,9 @@ function OverviewTab({ dashboard }: { dashboard: DashboardStats }) {
       <div className="grid gap-4">
         <ChartCard
           title="Top talkers"
-          description="A fast read on who sends the most messages in the chat."
+          description="Messages sent by each participant."
         >
-          <ChartContainer config={countConfig} className="h-80 w-full aspect-auto">
+          <ChartContainer config={talkerConfig} className="h-80 w-full aspect-auto">
             <BarChart data={dashboard.perUser.comparison}>
               <CartesianGrid vertical={false} />
               <XAxis
@@ -238,14 +184,14 @@ function OverviewTab({ dashboard }: { dashboard: DashboardStats }) {
               />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
               <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="messages" radius={[8, 8, 0, 0]} fill="var(--color-count)" />
+              <Bar dataKey="messages" radius={[8, 8, 0, 0]} fill="var(--color-messages)" />
             </BarChart>
           </ChartContainer>
         </ChartCard>
 
         <ChartCard
           title="Messages by date"
-          description="Which dates spiked the hardest across the full export."
+          description="Daily message totals across the sample."
         >
           <ChartContainer config={dateConfig} className="h-80 w-full aspect-auto">
             <AreaChart data={dashboard.timeBuckets.byDate}>
@@ -278,11 +224,11 @@ function OverviewTab({ dashboard }: { dashboard: DashboardStats }) {
       </div>
 
       <div className="grid gap-4">
-        <Card className="border border-border/70 bg-card/85">
+        <Card className="border border-border bg-card ring-0">
           <CardHeader>
             <CardTitle>Conversation snapshot</CardTitle>
             <CardDescription>
-              The chat at a glance before you dive into the tabs.
+              Participation and consistency over time.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -313,11 +259,11 @@ function OverviewTab({ dashboard }: { dashboard: DashboardStats }) {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/70 bg-card/85">
+        <Card className="border border-border bg-card ring-0">
           <CardHeader>
             <CardTitle>Peak moments</CardTitle>
             <CardDescription>
-              The busiest slices of time in the chat.
+              When the conversation was most active.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
@@ -445,7 +391,7 @@ function PeopleTab({ dashboard }: { dashboard: DashboardStats }) {
         </ChartCard>
       </div>
 
-      <Card className="border border-border/70 bg-card/85">
+      <Card className="border border-border bg-card ring-0">
         <CardHeader>
           <CardTitle>Per-user drilldown</CardTitle>
           <CardDescription>
@@ -457,14 +403,14 @@ function PeopleTab({ dashboard }: { dashboard: DashboardStats }) {
           <Tabs defaultValue="user-0" className="gap-4">
             <TabsList className="h-auto w-full flex-wrap justify-start gap-1 rounded-xl bg-muted/70 p-2">
               {users.map((user, index) => (
-                <TabsTrigger key={user.sender} value={`user-${index}`}>
-                  {truncateLabel(user.sender, 16)}
+                <TabsTrigger key={index} value={`user-${index}`}>
+                  {user.sender}
                 </TabsTrigger>
               ))}
             </TabsList>
             {users.map((user, index) => (
               <TabsContent
-                key={user.sender}
+                key={index}
                 value={`user-${index}`}
                 className="space-y-4"
               >
@@ -609,7 +555,7 @@ function WordsTab({ dashboard }: { dashboard: DashboardStats }) {
 
       <ChartCard
         title="Top emojis"
-        description="The emoji palette of the conversation."
+        description="Most frequently used emojis."
       >
         <ChartContainer config={emojiConfig} className="h-[30rem] w-full aspect-auto">
           <BarChart data={topEmojiChart}>
@@ -617,14 +563,7 @@ function WordsTab({ dashboard }: { dashboard: DashboardStats }) {
             <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={10} />
             <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-              {topEmojiChart.map((entry, index) => (
-                <Cell
-                  key={`${entry.label}-${index}`}
-                  fill={`var(--color-chart-${(index % 5) + 1})`}
-                />
-              ))}
-            </Bar>
+            <Bar dataKey="value" radius={[8, 8, 0, 0]} fill="var(--color-value)" />
           </BarChart>
         </ChartContainer>
       </ChartCard>
@@ -688,7 +627,7 @@ function HighlightsTab({ dashboard }: { dashboard: DashboardStats }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {highlights.map((highlight) => (
-        <Card key={highlight.title} className="border border-border/70 bg-card/85">
+        <Card key={highlight.title} className="border border-border bg-card ring-0">
           <CardHeader className="gap-3">
             <div className="flex items-center gap-2 text-primary">
               <highlight.icon className="size-4" />
@@ -705,52 +644,30 @@ function HighlightsTab({ dashboard }: { dashboard: DashboardStats }) {
   )
 }
 
-function LoadErrorCard({
-  fileName,
-  error,
-  compact = false,
-}: {
-  fileName: string
-  error: string | null
-  compact?: boolean
-}) {
-  return (
-    <Card className="border border-destructive/30 bg-card/85">
-      <CardHeader className={compact ? "py-10 text-center" : "py-14 text-center"}>
-        <CardTitle>Couldn&apos;t read {fileName}</CardTitle>
-        <CardDescription className="mx-auto max-w-2xl">
-          {error ??
-            "The dashboard could not load the root chat export. Make sure _chat.txt exists in the project root and matches the WhatsApp export format."}
-        </CardDescription>
-      </CardHeader>
-    </Card>
-  )
-}
-
 function StatCard({
   title,
   value,
-  description,
   icon: Icon,
+  warm = false,
 }: {
   title: string
-  value: string
-  description: string
-  icon: React.ComponentType<{ className?: string }>
+  value: number
+  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>
+  warm?: boolean
 }) {
+  const accent = warm ? "bg-highlight/14 text-highlight" : "bg-primary/14 text-primary"
   return (
-    <Card className="border border-border/70 bg-card/85 backdrop-blur">
-      <CardHeader className="gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <CardDescription>{title}</CardDescription>
-          <div className="rounded-full border border-border/70 bg-background/80 p-2 text-primary">
-            <Icon className="size-4" />
-          </div>
-        </div>
-        <div className="text-3xl font-semibold tracking-tight">{value}</div>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-    </Card>
+    <div className="bg-card p-4 sm:p-5">
+      <dt className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${accent}`}>
+          <Icon className="size-4" aria-hidden />
+        </span>
+        {title}
+      </dt>
+      <dd className="mt-2 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">
+        {numberFormatter.format(value)}
+      </dd>
+    </div>
   )
 }
 
@@ -765,7 +682,7 @@ function ChartCard({
   className?: string
 }>) {
   return (
-    <Card className={`border border-border/70 bg-card/85 ${className ?? ""}`}>
+    <Card className={`border border-border bg-card ring-0 ${className ?? ""}`}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -785,7 +702,7 @@ function LeaderCard({
   icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <Card className="border border-border/70 bg-card/85">
+    <Card className="border border-border bg-card ring-0">
       <CardHeader className="gap-2">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Icon className="size-4" />
@@ -814,7 +731,7 @@ function RankedItemsCard({
   columns?: 1 | 2
 }) {
   return (
-    <Card className="border border-border/70 bg-card/85">
+    <Card className="border border-border bg-card ring-0">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>

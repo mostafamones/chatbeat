@@ -21,8 +21,8 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "WhatsApp Recap",
-  description: "A dark WhatsApp dashboard for uploaded chat exports.",
+  title: "Chatbeat",
+  description: "Explore message activity, participants, and reactions from a WhatsApp chat export in your browser.",
 }
 
 export default function RootLayout({

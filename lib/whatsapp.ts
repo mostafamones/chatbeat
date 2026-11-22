@@ -257,7 +257,7 @@ export function computeDashboardStats(
     if (!userMap.has(message.sender)) {
       userMap.set(message.sender, {
         summary: {
-          sender: message.sender,
+          sender: getParticipantInitials(message.sender),
           messagesCount: 0,
           wordsCount: 0,
           lettersCount: 0,
@@ -370,6 +370,20 @@ export function computeDashboardStats(
       chatRange: getChatRange(contentMessages),
     },
   }
+}
+
+function getParticipantInitials(sender: string) {
+  if (/^\p{Lu}{2}$/u.test(sender)) {
+    return sender
+  }
+
+  const [first, ...rest] = sender.match(/\p{L}[\p{L}\p{M}]*/gu) ?? []
+  if (!first) return "U"
+
+  return [first, rest.at(-1) ?? ""]
+    .map((part) => part.match(/^\p{L}\p{M}*/u)?.[0] ?? "")
+    .join("")
+    .toUpperCase()
 }
 
 function splitRawEntries(rawText: string) {

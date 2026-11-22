@@ -1,29 +1,34 @@
 import { readFile } from "node:fs/promises"
 import path from "node:path"
 
-import { WhatsAppDashboard } from "@/components/dashboard/whatsapp-dashboard"
+import Image from "next/image"
+
+import { ChatRecap } from "@/components/dashboard/chat-recap"
+import { HowToUse } from "@/components/dashboard/how-to-use"
 import { computeDashboardStats, parseWhatsAppTxt } from "@/lib/whatsapp"
 
-export default async function Page() {
-  const fileName = "_chat.txt"
-  const filePath = path.join(process.cwd(), fileName)
-  let dashboard = null
-  let errorMessage: string | null = null
+import chatbeatIcon from "./icon.png"
 
-  try {
-    const rawText = await readFile(filePath, "utf8")
-    const messages = parseWhatsAppTxt(rawText)
-    dashboard = computeDashboardStats(messages)
-  } catch (error) {
-    errorMessage =
-      error instanceof Error ? error.message : "Failed to read the root chat file."
-  }
+export default async function Page() {
+  const rawText = await readFile(
+    path.join(process.cwd(), "public", "sample-chat.txt"),
+    "utf8"
+  )
+  const dashboard = computeDashboardStats(parseWhatsAppTxt(rawText))
 
   return (
-    <WhatsAppDashboard
-      dashboard={dashboard}
-      fileName={fileName}
-      error={errorMessage}
-    />
+    <>
+      <header className="border-b border-border">
+        <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2.5 text-base font-semibold tracking-tight">
+            <Image src={chatbeatIcon} width={28} height={28} alt="" unoptimized />
+            Chatbeat
+          </div>
+          <HowToUse />
+        </div>
+      </header>
+
+      <ChatRecap sample={dashboard} />
+    </>
   )
 }
