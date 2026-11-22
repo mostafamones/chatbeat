@@ -58,87 +58,88 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-      <section
-        aria-labelledby="recap-title"
-        className="relative isolate grid items-end gap-7 pt-10 pb-8 sm:pt-14 lg:grid-cols-[1.3fr_1fr] lg:gap-12 lg:pt-16"
-      >
+    <main className="pb-12">
+      <section aria-labelledby="recap-title" className="relative isolate">
         <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_78%_45%,var(--hero-glow),transparent_70%)]"
+          className="pointer-events-none absolute inset-x-0 -top-6 -bottom-8 -z-10 bg-[radial-gradient(ellipse_65%_90%_at_76%_42%,var(--hero-glow),transparent_82%)] mask-[linear-gradient(to_bottom,transparent,black_22%,black_65%,transparent)]"
           aria-hidden="true"
         />
-        <div>
-          <h1
-            id="recap-title"
-            className="font-heading text-4xl leading-[1.07] font-bold tracking-[-0.055em] text-balance sm:text-6xl"
-          >
-            Every chat has a <span className="text-primary">rhythm.</span>
-          </h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-            See who keeps the conversation going, when the group gets busiest,
-            and which emojis show up the most.
-          </p>
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <input
-              ref={fileInput}
-              type="file"
-              accept=".txt,text/plain"
-              className="hidden"
-              onChange={openExport}
-            />
-            <Button
-              aria-describedby="chat-export-hint"
-              className="h-10 gap-2 rounded-lg px-3 text-sm"
-              disabled={isReading}
-              onClick={() => fileInput.current?.click()}
+        <div className="mx-auto grid max-w-7xl items-end gap-7 px-4 pt-10 pb-8 sm:px-6 sm:pt-14 lg:grid-cols-[1.3fr_1fr] lg:gap-12 lg:px-8 lg:pt-16">
+          <div>
+            <h1
+              id="recap-title"
+              className="font-heading text-4xl leading-[1.07] font-bold tracking-[-0.055em] text-balance sm:text-6xl"
             >
-              <IconFileUpload data-icon="inline-start" aria-hidden="true" />
-              {isReading ? "Reading chat…" : "Open WhatsApp export"}
-            </Button>
-            <p id="chat-export-hint" className="text-sm text-muted-foreground">
-              Choose a .txt file. It stays in your browser.
+              Every chat has a <span className="text-primary">rhythm.</span>
+            </h1>
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
+              See who keeps the conversation going, when the group gets busiest,
+              and which emojis show up the most.
             </p>
-          </div>
-          <p role="status" className="sr-only">
-            {imported ? "Your WhatsApp recap is ready." : ""}
-          </p>
-          {error ? (
-            <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>
-          ) : null}
-        </div>
-
-        <figure className="flex min-h-56 flex-col justify-between self-stretch rounded-2xl border border-primary/24 bg-linear-to-br from-activity-panel to-card p-5 sm:p-6">
-          <figcaption className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
-            <span className="text-base font-semibold">Messages by hour</span>
-            <span className="rounded-full bg-highlight/12 px-2.5 py-1 font-medium text-highlight">
-              Busiest at {busiestHour}
-            </span>
-          </figcaption>
-          <div
-            className="mt-6 grid h-28 grid-cols-[repeat(24,minmax(0,1fr))] items-end gap-1 border-b border-primary/20 sm:h-32 sm:gap-1.5"
-            aria-hidden="true"
-          >
-            {byHour.map(({ hour, count }) => (
-              <div
-                key={hour}
-                className={
-                  count === peakCount
-                    ? "rounded-t-sm bg-highlight"
-                    : "rounded-t-sm bg-primary/78"
-                }
-                style={{ height: `${(count / peakCount) * 100}%` }}
+            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <input
+                ref={fileInput}
+                type="file"
+                accept=".txt,text/plain"
+                className="hidden"
+                onChange={openExport}
               />
-            ))}
+              <Button
+                aria-describedby="chat-export-hint"
+                className="h-10 gap-2 rounded-lg px-4 text-sm/5"
+                disabled={isReading}
+                onClick={() => fileInput.current?.click()}
+              >
+                <IconFileUpload className="size-4" aria-hidden="true" />
+                {isReading ? "Reading chat…" : "Open WhatsApp export"}
+              </Button>
+              <p id="chat-export-hint" className="text-sm text-muted-foreground">
+                Choose a .txt file. It stays in your browser.
+              </p>
+            </div>
+            <p role="status" className="sr-only">
+              {imported ? "Your WhatsApp recap is ready." : ""}
+            </p>
+            {error ? (
+              <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>
+            ) : null}
           </div>
-          <div className="mt-2 flex justify-between font-mono text-xs text-muted-foreground" aria-hidden="true">
-            <span>12 AM</span>
-            <span>12 PM</span>
-            <span>11 PM</span>
-          </div>
-        </figure>
+
+          <figure className="w-full rounded-2xl border border-primary/24 bg-linear-to-br from-activity-panel to-card p-4 sm:p-5 lg:max-w-sm lg:self-center lg:justify-self-end">
+            <figcaption className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
+              <span className="text-base font-semibold">Messages by hour</span>
+              <span className="rounded-full bg-highlight/12 px-2.5 py-1 font-medium text-highlight">
+                Busiest at {busiestHour}
+              </span>
+            </figcaption>
+            <div
+              className="mt-4 grid h-18 grid-cols-[repeat(24,minmax(0,1fr))] items-end gap-1 border-b border-primary/20 sm:h-22"
+              aria-hidden="true"
+            >
+              {byHour.map(({ hour, count }) => (
+                <div
+                  key={hour}
+                  className={
+                    count === peakCount
+                      ? "rounded-t-sm bg-highlight"
+                      : "rounded-t-sm bg-primary/78"
+                  }
+                  style={{ height: `${(count / peakCount) * 100}%` }}
+                />
+              ))}
+            </div>
+            <div className="mt-2 flex justify-between font-mono text-xs text-muted-foreground" aria-hidden="true">
+              <span>12 AM</span>
+              <span>12 PM</span>
+              <span>11 PM</span>
+            </div>
+          </figure>
+        </div>
       </section>
 
-      <WhatsAppDashboard key={imported?.revision ?? "sample"} dashboard={dashboard} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <WhatsAppDashboard key={imported?.revision ?? "sample"} dashboard={dashboard} />
+      </div>
     </main>
   )
 }

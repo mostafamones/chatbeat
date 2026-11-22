@@ -11,9 +11,9 @@ export function HowToUse() {
       <Dialog.Trigger asChild>
         <Button
           variant="outline"
-          className="h-10 gap-2 rounded-lg pr-3 pl-5 text-sm text-muted-foreground"
+          className="h-10 gap-2 rounded-lg px-4 text-sm/5 text-muted-foreground"
         >
-          <IconHelpCircle aria-hidden="true" />
+          <IconHelpCircle className="size-4" aria-hidden="true" />
           How to use
         </Button>
       </Dialog.Trigger>
