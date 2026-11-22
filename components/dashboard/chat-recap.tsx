@@ -18,7 +18,7 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
 
   const dashboard = imported?.dashboard ?? sample
   const { byHour } = dashboard.timeBuckets
-  const { busiestHour, chatRange } = dashboard.insights
+  const { busiestHour } = dashboard.insights
   const peakCount = Math.max(1, ...byHour.map(({ count }) => count))
 
   async function openExport(event: ChangeEvent<HTMLInputElement>) {
@@ -68,9 +68,6 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
           aria-hidden="true"
         />
         <div>
-          <p role="status" className="mb-4 w-fit rounded-full bg-primary/12 px-3 py-1 text-sm font-medium text-primary">
-            {imported ? "Your WhatsApp chat" : "Fictional group chat"}
-          </p>
           <h1
             id="recap-title"
             className="font-heading text-4xl leading-[1.07] font-bold tracking-[-0.055em] text-balance sm:text-6xl"
@@ -81,12 +78,7 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
             See who keeps the conversation going, when the group gets busiest,
             and which emojis show up the most.
           </p>
-          {chatRange ? (
-            <p className="mt-5 text-sm text-muted-foreground">
-              {chatRange.start} – {chatRange.end}
-            </p>
-          ) : null}
-          <div className="mt-5">
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
             <input
               ref={fileInput}
               type="file"
@@ -95,6 +87,7 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
               onChange={openExport}
             />
             <Button
+              aria-describedby="chat-export-hint"
               className="h-10 gap-2 rounded-lg px-3 text-sm"
               disabled={isReading}
               onClick={() => fileInput.current?.click()}
@@ -102,9 +95,12 @@ export function ChatRecap({ sample }: { sample: DashboardStats }) {
               <IconFileUpload data-icon="inline-start" aria-hidden="true" />
               {isReading ? "Reading chat…" : "Open WhatsApp export"}
             </Button>
+            <p id="chat-export-hint" className="text-sm text-muted-foreground">
+              Choose a .txt file. It stays in your browser.
+            </p>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Choose an exported .txt file. It stays in your browser.
+          <p role="status" className="sr-only">
+            {imported ? "Your WhatsApp recap is ready." : ""}
           </p>
           {error ? (
             <p role="alert" className="mt-2 text-sm text-destructive">{error}</p>
